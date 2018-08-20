@@ -2,7 +2,7 @@ import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-public class Main {
+public class AutoProducerConsumer {
 
     //Concurent packeges handles synchronization
     private static BlockingQueue<Integer> queue = new ArrayBlockingQueue<Integer>(10);
