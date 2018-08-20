@@ -1,3 +1,6 @@
+import java.security.PrivateKey;
+import java.util.LinkedList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class ManualProducerConsumer {
@@ -39,22 +42,41 @@ public class ManualProducerConsumer {
 
     public class Processor {
 
+        private LinkedList<Integer> list = new LinkedList<Integer>();
+        private final int LIMIT = 10;
+        private Object lock = new Object();
+
         public void produce() throws InterruptedException {
+            int value = 0;
+
             synchronized (this) {
-                System.out.println("Producer thread running ..");
-                wait();
-                System.out.printf("Resumed");
+                while (true) {
+                    synchronized (lock) {
+                        while (list.size() == LIMIT) {
+                            lock.wait();
+                        }
+                        list.add(value++);
+                        lock.notify();
+                    }
+                }
             }
         }
 
         public void consume() throws  InterruptedException {
-            Scanner scanner = new Scanner(System.in);
-            Thread.sleep(2000);
-            synchronized (this){
-                System.out.println("Waiting for return key");
-                scanner.nextLine();
-                System.out.println("return key pressed");
-                notify();
+
+            Random random = new Random();
+
+            while (true) {
+                synchronized (lock){
+                    while(list.size() == 0) {
+                        lock.wait();
+                    }
+                    System.out.println("List size is: " + list.size());
+                    int value = list.removeFirst();
+                    System.out.println("; value is: " + value);
+                    lock.notify();
+                }
+                Thread.sleep(random.nextInt(1000));
             }
         }
     }
